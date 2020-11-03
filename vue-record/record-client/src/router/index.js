@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Login from '@/views/login/index'
 import Info from '@/views/info/info'
 import Detail from '@/views/detail/detail'
+import MyPublish from '@/views/myPublish/myPublish'
 
 
 Vue.use(VueRouter)
@@ -40,6 +41,11 @@ const routes = [
         path: '/home/mine',
         name: 'mine',
         component: () => import('@/views/mine/mine'),
+      },
+      {
+        path: '/home/search',
+        name: 'search',
+        component: () => import('@/views/search/search'),
       }
     ]
   },
@@ -52,6 +58,11 @@ const routes = [
     path: '/detail',
     name: 'detail',
     component: Detail
+  },
+  {
+    path: '/myPublish',
+    name: 'myPublish',
+    component: MyPublish
   }
 
 ]

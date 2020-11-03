@@ -8,15 +8,34 @@ const getRecords = data => {
     })
 }
 
-// const  getInfo = data => {
-//     return axios({
-//         url: '/info',
-//         method: 'post',
-//         data
-//     })
-// }
+const  getInfo = data => {
+    return axios({
+        url: '/info',
+        method: 'post',
+        data
+    })
+}
+
+const getPublish = data => {
+    return axios({
+        url: '/mine',
+        method: 'post',
+        data
+    })
+}
+
+
+const getSearchSuggest = data => {
+    return axios({
+        url: '/home/search',
+        method: 'post',
+        data
+    })
+}
 
 export default {
     getRecords,
-    // getInfo
+    getPublish,
+    getInfo,
+    getSearchSuggest
 }

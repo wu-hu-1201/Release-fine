@@ -4,25 +4,25 @@
         <!--<van-icon name="arrow-left" @click="returnInfo(detail)" />-->
         <van-icon name="arrow-left" @click="returnPage" />
     </div>
-    <div class="wrapper-box">
+    <div class="wrapper-box" v-for="group in groups" :key="group.id">
         <div class="des-box">
             <div class="title">
-                <img v-lazy="detail.authorHeader" class="photo" />
-                <div class="name">{{ detail.authorName }}</div>
+                <img v-lazy="group.authorHeader" class="photo" />
+                <div class="name">{{ group.authorName }}</div>
             </div>
             <div class="logo-box">
-                <div class="logo">{{ detail.target }}</div>
+                <div class="logo">{{ group.target }}</div>
             </div>
-            <div class="head">{{ detail.title }}</div>
-            <div class="test">{{ detail.words }}</div>
+            <div class="head">{{ group.title }}</div>
+            <div class="test">{{ group.words }}</div>
             <van-swipe :autoplay="3000" class="swipe">
-                <van-swipe-item v-for="img in images" :key="img.id">
+                <van-swipe-item v-for="img in group" :key="img.id">
                     <img v-lazy="img" class="swipe-img" />
                 </van-swipe-item>
             </van-swipe>
         </div>
         <div class="time">
-            <div class="timeNum">{{detail.publishTime}}</div>
+            <div class="timeNum">{{group.publishTime}}</div>
             <div class="timeName">发布于</div>
         </div>
     </div>
@@ -44,16 +44,25 @@ Vue.use(Grid);
 Vue.use(GridItem);
 
 export default {
-    data() {
-        return {
-            detail: [],
-            images: []
+    props: {
+        'groups': {
+            type: Array,
+            require: true
         }
     },
+    // data() {
+    //     return {
+    //         detail: [],
+    //         images: []
+    //     }
+    // },
     mounted() {
-        this.detail = this.$route.query.des
-        console.log(this.detail)
-        this.images = this.detail.images
+        // this.detail = this.$route.query.des
+        // console.log(this.detail)
+        // this.images = this.detail.images
+        // console.log(this.groups)
+        // this.images = this.groups.images
+        // console.log(this.images)
     },
     methods: {
         // returnInfo(detail) {
@@ -62,7 +71,7 @@ export default {
         // }
         returnPage() {
             console.log("e");
-            this.$router.go(-1);
+            this.$router.go(0);
         },
     }
 };
