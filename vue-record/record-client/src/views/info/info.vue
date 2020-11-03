@@ -1,6 +1,6 @@
 <template>
 <div class="all">
-    <div class="quiet">
+    <div class="quiet" v-show="showQuiet">
         <div class="head">
             <div class="background">
                 <img src="https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2858800443,121828722&fm=26&gp=0.jpg" class="bg-img" />
@@ -14,6 +14,7 @@
             </div>
         </div>
         <div class="wrapper">
+            <!--<div class="group" v-for="group in groups" :key="group.id" @click="goDetail">-->
             <div class="group" v-for="group in groups" :key="group.id" @click="goDetail(group)">
                 <img v-lazy="group.images[0]" class="group-img" v-if="group.images.length" />
                 <div class="des">
@@ -27,12 +28,15 @@
             </div>
         </div>
     </div>
-    <!-- <v-detail v-show="showDetail"></v-detail> -->
+    <!--<Detail :groups="groups" v-show="showDetail" />-->
 </div>
 </template>
 
 <script>
 import Vue from "vue";
+// import {
+//     mapState
+// } from 'vuex';
 import {
     Lazyload
 } from "vant";
@@ -41,37 +45,49 @@ import {
 Vue.use(Lazyload);
 
 export default {
+    // computed: {
+    //     ...mapState({
+    //         record: state => state.record.user
+    //     })
+    // },
     // components: {
-    //   'v-detail': Detail
+    //     Detail
     // },
     data() {
         return {
-            // quiet: true,
-            // showDetail: false,
+            showQuiet: true,
+            showDetail: false,
             detail: '',
             de: [],
             groups: [],
         };
     },
     mounted() {
-        this.groups = this.$route.query.group.dess;
-        // this.de = this.$route.query.group.title
-        console.log(this.groups);
-        // this.detail = this.$route.query.detail.target
-        // console.log(this.detail)
-        // console.log(this.de)
-        // this.$http.getInfo({target: this.de})
-        // .then(res => {
-        //   this.records = res.data
-        //   console.log(this.records)
-        //   this.groups.forEach(item => {
-        //     for (let one of this.records) {
-        //       item.unshift(one)
-        //     }
-        //   })
-        //   console.log(this.groups)
-        // })
+        // this.groups = this.$route.query.group.dess;
+        // console.log(this.groups);
+        this.detail = this.$route.query.group
+        console.log(this.detail)
+        this.$http.getInfo({
+                target: this.detail
+            })
+            .then(res => {
+                this.groups = res.data
+                this.groups.reverse()
+                console.log(this.groups)
+            })
     },
+    // created() {
+    //     //在页面加载时读取sessionStorage里的状态信息
+    //     if (sessionStorage.getItem("store")) {
+    //         this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(sessionStorage.getItem("store"))))
+    //     }
+
+    //     //在页面刷新时将vuex里的信息保存到sessionStorage里
+    //     window.addEventListener("beforeunload", () => {
+    //         sessionStorage.setItem("store", JSON.stringify(this.$store.state))
+    //     })
+    // },
+
     methods: {
         goDetail(group) {
             console.log(group);
@@ -84,6 +100,10 @@ export default {
             // this.quiet = false
             // this.showDetail = true
         },
+        // goDetail() {
+        //     this.showQuiet = false
+        //     this.showDetail = true
+        // },
         returnPage() {
             console.log("e");
             this.$router.go(-1);

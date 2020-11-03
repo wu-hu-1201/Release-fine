@@ -11,7 +11,7 @@
                 <div class="item-name">资料修改</div>
                 <img class="z1" src="@/assets/z1.png" />
             </div>
-            <div class="item" @click="goMyPublish">
+            <div class="item" @click="goMyPublish(user)">
                 <div class="item-name">我的发布</div>
                 <img class="z2" src="@/assets/z2.png" />
             </div>
@@ -41,6 +41,7 @@
         <div class="release" @click="release">确定</div>
         <div class="release01" @click="cancel">取消</div>
     </div>
+    <MyPublish v-show="myPublish" :publishInfo="publishInfo" />
 </div>
 </template>
 
@@ -49,6 +50,8 @@ import {
     mapMutations,
     mapState
 } from 'vuex';
+import MyPublish from '@/components/myPublish.vue';
+
 export default {
     computed: {
         ...mapState({
@@ -60,23 +63,55 @@ export default {
             editInfo: '',
             wrapper: true,
             fileList: [],
-            // name: "",
             message: false,
-            // signature: ''
+            myPublish: false,
+            publishInfo: [],
             defaultHeader: '@/assets/2.png'
         };
     },
-    mounted() {
-        this.editInfo = Object.assign({}, this.user)
+    components: {
+        MyPublish
     },
+    mounted() {
+        this.editInfo = Object.assign({}, this.user);
+
+    },
+    created() {
+        //在页面加载时读取sessionStorage里的状态信息
+        if (sessionStorage.getItem("store")) {
+            this.$store.replaceState(Object.assign({}, this.$store.state, JSON.parse(sessionStorage.getItem("store"))))
+        }
+
+        //在页面刷新时将vuex里的信息保存到sessionStorage里
+        window.addEventListener("beforeunload", () => {
+            sessionStorage.setItem("store", JSON.stringify(this.$store.state))
+        })
+    },
+
     methods: {
         ...mapMutations(['SET_USER']),
         goMessage() {
             this.wrapper = false;
             this.message = true;
         },
-        goMyPublish() {
-
+        goMyPublish(user) {
+            console.log(user)
+            this.$router.push({
+                path: "/myPublish",
+                query: {
+                    group: user.userId
+                }
+            })
+            // this.wrapper = false
+            // this.myPublish = true
+            // this.$http.getPublish({
+            //         author: user.userId
+            //     })
+            //     .then(res => {
+            //         this.publishInfo = res.data
+            //         this.publishInfo.reverse()
+            //         console.log(this.publishInfo)
+            //     })
         },
         goPlace() {},
         goNote() {},

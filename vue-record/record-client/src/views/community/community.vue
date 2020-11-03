@@ -76,26 +76,6 @@ export default {
             user: state => state.user.user
         })
     },
-    methods: {
-        goInfo(group) {
-            console.log(group)
-            this.$router.push({
-                path: "/info",
-                query: {
-                    group: group
-                }
-            })
-        },
-        goDetail(des) {
-            console.log(des)
-            this.$router.push({
-                path: "/detail",
-                query: {
-                    des: des
-                }
-            });
-        },
-    },
     mounted() {
         // 获取所有发布的信息
         this.$http.getRecords({
@@ -121,7 +101,27 @@ export default {
                 console.log(this.groups);
             });
 
-    }
+    },
+    methods: {
+        goInfo(group) {
+            console.log(group)
+            this.$router.push({
+                path: "/info",
+                query: {
+                    group: group.title
+                }
+            })
+        },
+        goDetail(des) {
+            console.log(des)
+            this.$router.push({
+                path: "/detail",
+                query: {
+                    des: des
+                }
+            });
+        },
+    },
 };
 </script>
 
