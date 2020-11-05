@@ -8,7 +8,15 @@ const login = (data) => {
     })
 }
 
+const getLogin = (data) => {
+    return axios({
+        url: '/login',
+        method: 'post',
+        data
+    })
+}
 
 export default {
-    login
+    login,
+    getLogin
 }

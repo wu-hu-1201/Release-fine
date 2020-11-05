@@ -2,14 +2,14 @@
 <div class="wrapper">
     <van-search v-model="value" shape="round" background=" rgba(0, 40, 89, .5)" placeholder="请输入搜索关键词" @search="onSearch" @input="searchkey" @clear="clear" @blur="getHistory" />
     <div v-show="show_suggest" class="show_suggest">
-        <div class="search_suggest" v-for="suggest in searchSuggest" :key="suggest.id" @click="goSearch(suggest)">
+        <div class="search_suggest" v-for="suggest in searchSuggest" :key='suggest.id' @click="goSearch(suggest)">
             <img class="search-pic" src="@/assets/search.png" />
             <div class="search_suggest_name">{{suggest.title}}</div>
         </div>
     </div>
     <div v-show="show_result" class="show_result">
         <div class="search_result" v-for="result in searchResult" :key="result.id" @click="goDetail(result)">
-            <div class="search_result_name">{{result.title}}</div>
+            <div class="search_result_name" v-html="result.title"></div>
         </div>
     </div>
     <div v-show="show_history" class="show_history">
@@ -41,15 +41,21 @@ export default {
         return {
             value: '',
             inputValue: '',
+            results: [],
             searchSuggest: [],
             searchResult: [],
             history: [],
-            show_suggest: true,
-            show_result: false,
+            show_suggest: false,
+            show_result: true,
             show_history: true
         }
     },
     methods: {
+        clearTimer() {
+            if (this.timer) {
+                clearTimeout(this.timer)
+            }
+        },
         onSearch(val) {
             this.$http.getSearchSuggest({
                     title: val
@@ -63,38 +69,61 @@ export default {
         },
         searchkey(val) {
             // console.log(val)
+            this.clearTimer()
             this.inputValue = val
-            this.$http.getSearchSuggest({
-                    title: val
-                })
-                .then(res => {
-                    // console.log(res)
-                    this.searchSuggest = res.data
-                    // console.log(this.searchSuggest)
-                })
+            this.timer = setTimeout(() => {
+                this.$http.getSearchSuggest({
+                        title: val
+                    })
+                    .then(res => {
+                        // console.log(res)
+                        this.searchSuggest = res.data
+                        console.log(this.searchSuggest)
+                    })
+
+            }, 1000)
             this.show_suggest = true
         },
         goSearch(suggest) {
-            // console.log(suggest.title)
+            console.log(suggest)
             this.$http.getSearchSuggest({
                     title: suggest.title
                 })
                 .then(res => {
                     // console.log(res)
                     this.searchResult = res.data
-                    // console.log(this.searchResult)
+                    console.log(this.searchResult)
+                    this.changeColor(res.data)
                 })
             this.show_suggest = false
             this.show_history = false
             this.show_result = true
         },
+        changeColor(resultsList) {
+            resultsList.map((item, index) => {
+                if (this.value && this.value.length > 0) {
+                    // 匹配关键字正则
+                    let replaceReg = new RegExp(this.value, 'g')
+                    // 高亮替换v-html值
+                    let replaceString = '<span class="search-text">' + this.value + '</span>'
+                    resultsList[index].title = item.title.replace(
+                        replaceReg,
+                        replaceString
+                    )
+                }
+            })
+            this.results = []
+            this.results = resultsList
+            console.log(this.results)
+        },
         clear() {
             this.show_result = false
             this.show_history = true
+            this.show_suggest = false
             return
         },
         goDetail(result) {
-            // console.log(result)
+            console.log(result)
             this.$router.push({
                 path: "/detail",
                 query: {
@@ -119,18 +148,20 @@ export default {
             console.log(this.inputValue)
             if (this.inputValue.length > 0) {
                 let history = localStorage.getItem("history") || []
-                history = history.filter(item => item !== this.inputValue)
-                history.unshift(this.inputValue)
-                localStorage.getItem("histroy", history)
+                this.history = this.history.filter(item => item !== this.inputValue)
                 console.log(history)
+                history.unshift(this.inputValue)
+                this.history = this.history.concat(history)
+                this.history.reverse()
+                console.log(this.history)
+                localStorage.setItem("histroy", history)
             } else {
                 return
             }
         },
         deleteHis() {
             Dialog.confirm({
-                    title: '标题',
-                    message: '弹窗内容',
+                    message: '是否删除历史记录',
                 })
                 .then(() => {
                     this.history = []
@@ -149,6 +180,7 @@ export default {
                     // console.log(res)
                     this.searchResult = res.data
                     // console.log(this.searchResult)
+                    this.changeColor(res.data)
                 })
             this.show_suggest = false
             this.show_history = false
@@ -156,8 +188,9 @@ export default {
         }
     },
     mounted() {
+        // this.history = localStorage.getItem(JSON.stringify([..."history"])) || []
         this.history = localStorage.getItem("history") || []
-    },
+    }
 };
 </script>
 
@@ -240,5 +273,9 @@ export default {
 .historyName {
     font-size: 15px;
     margin: 10px 10px 10px 10px;
+}
+
+.search-text {
+    color: red;
 }
 </style>
